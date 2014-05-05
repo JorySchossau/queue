@@ -38,16 +38,12 @@ def joinpath(*args):
 def existingProjects():
 	projects = [];
 	confdir = joinpath(SCRATCH, ".queue");
-	#print("checking if "+confdir+" is a dir");
 	if os.path.isdir(confdir):
-		#print("yes, hidden dir exists");
 		for folder in os.walk(confdir).next()[1]:
-			#print("found folder: "+folder);
 			projectdir = joinpath(confdir,folder);
 			projects.append(projectdir);
 		return projects
 	else:
-		#print("nope, "+confdir+" is not a dir");
 		return False
 
 def quitWithMsg(msg):
@@ -74,25 +70,21 @@ def splitArrayJob(jobfile,jobtext,begin,end):
 	firstJobMade=False;
 	projectdir=joinpath(SCRATCH,".queue");
 	jobs_to_add = [];
-	## create output directory
 	projdirname = "array_"+jobfile;
 	if not os.path.exists(joinpath(SCRATCH,".queue",projdirname)):
 		os.makedirs(joinpath(SCRATCH,".queue",projdirname));
-	for set in range(SETS): #for set in $(seq 0 $[SETS-1]); do
-		this_filename = str(set*JOB_ARRAY_MAX+begin)+"."+str(set*JOB_ARRAY_MAX+begin+JOB_ARRAY_MAX-1)+".sh"; #THIS_FILENAME=$[set*JOB_ARRAY_MAX+BEGIN].$[set*JOB_ARRAY_MAX+BEGIN+JOB_ARRAY_MAX-1].sh
+	for set in range(SETS):
+		this_filename = str(set*JOB_ARRAY_MAX+begin)+"."+str(set*JOB_ARRAY_MAX+begin+JOB_ARRAY_MAX-1)+".sh";
 		jobs_to_add.append(this_filename);
 		open(joinpath(projectdir,"array_"+jobfile,this_filename),'w').write(rxEnd.sub(str(set*JOB_ARRAY_MAX+begin+JOB_ARRAY_MAX-1),rxBegin.sub(str(set*JOB_ARRAY_MAX+begin),jobtext)));
-		#check_output(["sed -e s#XBEGINX#"+str(set*JOB_ARRAY_MAX+begin)+"#g "+jobfile+" | sed -e s#XENDX#"+str(set*JOB_ARRAY_MAX+begin+JOB_ARRAY_MAX-1)+"#g > "+joinpath(projectdir,"array_"+jobfile,this_filename)], shell=True); #sed -e s#XBEGINX#$[set*JOB_ARRAY_MAX+BEGIN]#g $FILE | sed -e s#XENDX#$[set*JOB_ARRAY_MAX+BEGIN+JOB_ARRAY_MAX-1]#g > array_$FILE/$THIS_FILENAME
 		firstJobMade=True;
-	if (REMAINDER != 0): #if ! [ "$REMAINDER" -eq 0 ]; then #if there is an incomplete set (< JOB_ARRAY_MAX) then submit those
-		this_filename = str(SETS*JOB_ARRAY_MAX+begin)+"."+str(end)+".sh"; #THIS_FILENAME=$[SETS*JOB_ARRAY_MAX+BEGIN].$END.sh
+	if (REMAINDER != 0):
+		this_filename = str(SETS*JOB_ARRAY_MAX+begin)+"."+str(end)+".sh";
 		jobs_to_add.append(this_filename);
-		if (firstJobMade == True): #if [ -z $PREV_JOBID ]; then #if this is first job and there is only an incomplete set (< JOB_ARRAY_MAX)
+		if (firstJobMade == True):
 			open(joinpath(projectdir,"array_"+jobfile,this_filename),'w').write(rxEnd.sub(str(end),rxBegin.sub(str(SETS*JOB_ARRAY_MAX+begin),jobtext)));
-			#check_output(["sed -e s#XBEGINX#"+str(SETS*JOB_ARRAY_MAX+begin)+"#g "+jobfile+" | sed -e s#XENDX#"+str(end)+"#g > "+joinpath(projectdir,"array_"+jobfile,this_filename)], shell=True); #sed -e s#XBEGINX#$[SETS*JOB_ARRAY_MAX+BEGIN]#g $FILE | sed -e s#XENDX#$END#g > array_$FILE/$THIS_FILENAME
-		else: #else #if this job has predecessors and this job is an incompelte set (< JOB_ARRAY_MAX)
+		else:
 			open(joinpath(projectdir,"array_"+jobfile,this_filename),'w').write(rxEnd.sub(str(end),rxBegin.sub(str(SETS*JOB_ARRAY_MAX+begin),jobtext)));
-			#check_output(["sed -e s#XBEGINX#"+str(SETS*JOB_ARRAY_MAX+begin)+"#g "+jobfile+" | sed -e s#XENDX#"+str(end)+"#g > "+joinpath(projectdir,"array_"+jobfile,this_filename)], shell=True); #sed -e s#XBEGINX#$[set*JOB_ARRAY_MAX+BEGIN]#g $FILE | sed -e s#XENDX#$[set*JOB_ARRAY_MAX+BEGIN+JOB_ARRAY_MAX-1]#g > array_$FILE/$THIS_FILENAME
 	pickle.dump(jobs_to_add, open(joinpath(SCRATCH,".queue",projdirname,".held"),"wb"));
 	submitted = [];
 	pickle.dump(submitted, open(joinpath(SCRATCH,".queue",projdirname,".submitted"),"wb")); #write empty array so file exists
@@ -232,11 +224,9 @@ def main():
 		while ((time.time() - timeStart) < justUnder4Hours):
 			done = checkOnJobsForProjects();
 			if (done == True):
-				#print("we're all done here. Wrapping up.");
 				markDaemonNotRunning();
 				sys.exit(0);
 			else:
-				#print("let's wait another minute.");
 				time.sleep(60); # wait one minute
 		submitSelf();
 		sys.exit(0);
