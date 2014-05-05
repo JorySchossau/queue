@@ -1,11 +1,11 @@
-#!/mnt/home/jory/epd/bin/python
+#!/usr/bin/python
 # path to python
 
 # where is your writable directory? Jobs will be managed in a .queue directory here.
-SCRATCH="/mnt/scratch/schossau"
+SCRATCH="pathToNetworkWritableFolder"
 
 # username
-USER="jory"
+USER="userName"
 
 # how big is one batch of jobs? ex 10 means there must be 10 free slots to run another batch.
 JOB_ARRAY_MAX=10
