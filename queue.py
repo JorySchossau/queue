@@ -65,8 +65,8 @@ def splitArrayJob(jobfile,jobtext,begin,end):
 	end = int(end);
 	rxBegin = re.compile(r'''XBEGINX''');
 	rxEnd = re.compile(r'''XENDX''');
-	SETS = (end - begin + 1) / JOB_ARRAY_MAX; #SETS=`echo "($END - $BEGIN + 1) / $JOB_ARRAY_MAX" | bc`
-	REMAINDER = (end - begin + 1) % JOB_ARRAY_MAX; #REMAINDER=`echo "($END - $BEGIN + 1) % $JOB_ARRAY_MAX" | bc`
+	SETS = (end - begin + 1) / JOB_ARRAY_MAX;
+	REMAINDER = (end - begin + 1) % JOB_ARRAY_MAX;
 	firstJobMade=False;
 	projectdir=joinpath(SCRATCH,".queue");
 	jobs_to_add = [];
