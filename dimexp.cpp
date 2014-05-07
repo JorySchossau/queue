@@ -4,7 +4,7 @@
 //output: space separated list of dimension indices large dim to small
 //input: <1D index integer> <list of dimension sizes in colon slice syntax>...
 //example:
-        //input: dimexp 115 10 10 10
+        //input: dimexp 115 1:10 1:10 1:10
         //output: 5 2 2
 
 #include <iostream>
