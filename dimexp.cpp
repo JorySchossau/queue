@@ -1,6 +1,8 @@
 //description: converts 1D index into higher D indices (0-based indices)
+// Useful for performing parameter sweeps, such as input combinations: (1,10), (2,10), ... (1,11), (2,11), (3,11)...
+// from only one number (such as PBS_ARRAYID)
 //output: space separated list of dimension indices large dim to small
-//input: <1D index integer> <list of dimension sizes until n-1>...
+//input: <1D index integer> <list of dimension sizes in colon slice syntax>...
 //example:
         //input: dimexp 115 10 10 10
         //output: 5 2 2
