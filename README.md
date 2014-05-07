@@ -30,6 +30,24 @@ This assumes your qsub array job is formatted using the PBS -t #-# syntax as bel
 
     #PBS -t 1 - 1024
 
+Example qsub submit file myarrayjob.sh
+
+    #!/bin/bash --login
+    
+    #PBS -l mem=2gb,nodes=1:ppn=1,walltime=03:59:59
+    #PBS -t 1-8704
+    
+    mkdir -p /mnt/scratch/jory/output
+    mkdir -p /mnt/scratch/jory/myjob${PBS_ARRAYID}
+    cd /mnt/scratch/jory/myjob${PBS_ARRAYID}
+    cp ~/myjob.exe .
+    ./myjob.exe ${PBS_ARRAYID}
+    # copy data
+    cp output.csv /mnt/scratch/jory/output/out${PBS_ARRAYID}.csv
+    # clean up
+    cd ..
+    rm -rf myjob${PBS_ARRAYID}
+
 #### Roadmap
 In no particular order.
 * Move config options to an external config file that is generated with sane values if it doesn't exist already.
