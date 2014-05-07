@@ -140,12 +140,11 @@ void showHelp(char* progname) {
 	cout << "\tExamples: " << endl;
 	cout << "\tInput: " <<  uppercase << progname << nouppercase
 		<< " 15 1:9 8:10" << endl;
-	cout << "\tOutput: 5 10" << endl;
+	cout << "\tOutput: 6 9" << endl;
 	cout << endl;
 	cout << "\tInput: " << uppercase << progname << nouppercase
 		<< " 52 8:10 1:9" << endl;
-	cout << "\tOutput: 0 0" << endl;
-	cout << "\t(index out of range)" << endl;
+	cout << "\tOutput: error: index '52' out of range ('1:27')" << endl;
 	cout << endl;
 	cout << "\tInput: " << uppercase << progname << nouppercase
 		<< " ? 8:10 1:9" << endl;
