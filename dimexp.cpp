@@ -2,8 +2,8 @@
 //output: space separated list of dimension indices large dim to small
 //input: <1D index integer> <list of dimension sizes until n-1>...
 //example:
-        //input: dimexp 115 10
-        //output: 11 5
+        //input: dimexp 115 10 10 10
+        //output: 5 2 2
 
 #include <iostream>
 #include <sstream>
