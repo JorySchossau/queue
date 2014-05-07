@@ -30,6 +30,12 @@ This assumes your qsub array job is formatted using the PBS -t #-# syntax as bel
 
     #PBS -t 1 - 1024
 
+#### Roadmap
+In no particular order.
+* Move config options to an external config file that is generated with sane values if it doesn't exist already.
+* Support qsub array shorthand description such as #PBS -t 5
+* Add ability to query status of all jobs / projects. Such as ./queue.py status
+
 #### Licensing
 Copyright (c) 2014, Jory Schossau
 All rights reserved.
