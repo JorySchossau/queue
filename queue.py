@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/pythonPath
 # path to python
 
 # where is your writable directory? Jobs will be managed in a .queue directory here.
@@ -65,6 +65,9 @@ def splitArrayJob(jobfile,jobtext,begin,end):
 	end = int(end);
 	rxBegin = re.compile(r'''XBEGINX''');
 	rxEnd = re.compile(r'''XENDX''');
+	rxMultiplier = re.compile(r'''XMULTIPLIERX''');
+	rxSet = re.compile(r'''XSETX''');
+	rxOffset = re.compile(r'''XOFFSETX''');
 	SETS = (end - begin + 1) / JOB_ARRAY_MAX;
 	REMAINDER = (end - begin + 1) % JOB_ARRAY_MAX;
 	firstJobMade=False;
@@ -76,15 +79,15 @@ def splitArrayJob(jobfile,jobtext,begin,end):
 	for set in range(SETS):
 		this_filename = str(set*JOB_ARRAY_MAX+begin)+"."+str(set*JOB_ARRAY_MAX+begin+JOB_ARRAY_MAX-1)+".sh";
 		jobs_to_add.append(this_filename);
-		open(joinpath(projectdir,"array_"+jobfile,this_filename),'w').write(rxEnd.sub(str(set*JOB_ARRAY_MAX+begin+JOB_ARRAY_MAX-1),rxBegin.sub(str(set*JOB_ARRAY_MAX+begin),jobtext)));
+		open(joinpath(projectdir,"array_"+jobfile,this_filename),'w').write(rxOffset.sub(str(begin-1),rxSet.sub(str(JOB_ARRAY_MAX),rxMultiplier.sub(str(set),rxEnd.sub(str(JOB_ARRAY_MAX),rxBegin.sub(str(1),jobtext)))))); ## for each set, multiplier=set, begin=begin, end=begin+JOB_ARRAY_MAX-1
 		firstJobMade=True;
 	if (REMAINDER != 0):
 		this_filename = str(SETS*JOB_ARRAY_MAX+begin)+"."+str(end)+".sh";
 		jobs_to_add.append(this_filename);
 		if (firstJobMade == True):
-			open(joinpath(projectdir,"array_"+jobfile,this_filename),'w').write(rxEnd.sub(str(end),rxBegin.sub(str(SETS*JOB_ARRAY_MAX+begin),jobtext)));
+			open(joinpath(projectdir,"array_"+jobfile,this_filename),'w').write(rxOffset.sub(str(begin-1),rxSet.sub(str(JOB_ARRAY_MAX),rxMultiplier.sub(str(SETS),rxEnd.sub(str(REMAINDER),rxBegin.sub(str(1),jobtext)))))); ## at remainder, assume first job started: multiplier=SETS, begin=1, end=end
 		else:
-			open(joinpath(projectdir,"array_"+jobfile,this_filename),'w').write(rxEnd.sub(str(end),rxBegin.sub(str(SETS*JOB_ARRAY_MAX+begin),jobtext)));
+			open(joinpath(projectdir,"array_"+jobfile,this_filename),'w').write(rxOffset.sub(str(begin-1),rxSet.sub(str(JOB_ARRAY_MAX),rxMultiplier.sub(str(SETS),rxEnd.sub(str(end-begin+1),rxBegin.sub(str(1),jobtext)))))); ## at remainder, assume NOT first job started: multiplier=
 	pickle.dump(jobs_to_add, open(joinpath(SCRATCH,".queue",projdirname,".held"),"wb"));
 	submitted = [];
 	pickle.dump(submitted, open(joinpath(SCRATCH,".queue",projdirname,".submitted"),"wb")); #write empty array so file exists
@@ -149,14 +152,16 @@ def markDaemonNotRunning():
 def getArrayRangeAndTemplateFile(filename):
 	'''takes a filename of a qsub submit file.
 	returns the numbers used in this type of line: #PBS -t 1-100
-	and returns the new file contents replaced with template symbols: #PBS -t XBEGINX-XENDX'''
+	and returns the new file contents replaced with template symbols: #PBS -t XBEGINX-XENDX
+	and a new line beneath that: PBS_ARRAYID=$[${PBS_ARRAYID}+XMULTIPLIERX*XSETX+XOFFSETX]'''
 
 	filetext = None;
 	with open(filename, 'r') as filehandle:
 		filetext = filehandle.read();
 	regex = re.compile(r'''PBS -t[\s]*(\d+)[\s]*-[\s]*(\d+)''');
 	match = regex.search(filetext);
-	filetext = regex.sub(r'''PBS -t XBEGINX-XENDX''',filetext);
+	filetext = regex.sub(r'''PBS -t XBEGINX-XENDX
+PBS_ARRAYID=$[${PBS_ARRAYID}+XMULTIPLIERX*XSETX+XOFFSETX]''',filetext);
 	return (match.group(1), match.group(2), filetext);
 
 def submitSelf():
